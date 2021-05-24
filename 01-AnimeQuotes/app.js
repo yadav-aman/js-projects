@@ -34,7 +34,6 @@ const showQuote = async (currentItem) => {
   anime.textContent = item.anime;
   quote.textContent = item.quote;
   img.src = "loading.png";
-  // due to restiction of API we can't request all images at once
   if (!item.url) {
     // Caching image urls from API
     item.url = await getImg(item.character);
@@ -44,6 +43,13 @@ const showQuote = async (currentItem) => {
 
 const main = async () => {
   quotes = await getQuotes();
+  quotes.forEach((item, index) => {
+    // due to restiction of API we can only do 2 requests per second
+    setTimeout(async () => {
+      item.url = await getImg(item.character);
+    }, index * 500);
+  });
+  console.log(quotes);
   showQuote(currentItem);
 
   nextbtn.addEventListener("click", () => {
